@@ -60,7 +60,7 @@ class CPU:
 
 	def __init__(self, filename= FILENAME):
 		"""Construct a new CPU."""
-		self.ram = [[0]*8] *256
+		self.ram = [0] *256
 		self.reg = [0] *8
 		self.pc = 0
 		self.address = 0
@@ -69,6 +69,7 @@ class CPU:
 
 
 	def HLT(self):
+		print( "HALT INITIATED")
 		running = 0
 		self.pc += 1
 
@@ -181,9 +182,9 @@ class CPU:
 			               PRN: self.PRN,
 			               HLT: self.HLT
 			}
-			switchTable[ PRN]()
-		self.trace()
-		running = 0
+			switchTable[ ir]()
+#		self.trace()
+#		running = 0
 
 
 
