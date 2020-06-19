@@ -63,9 +63,15 @@ class CPU:
 		self.ram = [0] *256
 		self.reg = [0] *8
 		self.pc = 0
-		self.address = 0
+#		self.address = 0
 		
 		self.filename = filename
+		
+		self.switchTable = {         # branch table masquerading as a switch
+			LDI: self.LDI,
+			PRN: self.PRN,
+			HLT: self.HLT
+			}
 
 
 	def HLT(self):
@@ -83,27 +89,27 @@ class CPU:
 
 
 	def LDI(self):
-		self.trace()
+#		self.trace()
 		num = self.ram[ self.pc + 1]
 		val = self.ram[ self.pc + 2]
 		self.reg[ num] = val
 		self.pc += 3
-		print( "LDI SUCCESSFUL")
-		self.trace()
+#		print( "LDI SUCCESSFUL")
+#		self.trace()
 
 
 	def PRN(self):
-		self.trace()
+#		self.trace()
 		num = self.ram[ self.pc + 1]
-		print( "IT'S ALIVE!", self.reg[ num])
+#		print( "IT'S ALIVE!", self.reg[ num])
 		self.pc +=2
-		self.trace()
+#		self.trace()
 
 
 	def load(self):
 		"""Load a program into memory."""
 	
-		address = self.address
+		address = 0
 	
 		# For now, we've just hardcoded a program:
 	
@@ -160,29 +166,40 @@ class CPU:
 		"""Run the CPU."""
 #		self.load()
 #		self.trace()
+		
 		with open( self.filename) as f:
-			address = self.address
+			address = 0
+			print( "OPENING FILE")
 			for line in f:
-				line = line.split("#")
-				try: v = int( line[0], 2)
-				except ValueError: continue
+				lineSplit = line.split("#")
+				try:
+					v = int( lineSplit[0], 2)
+				except ValueError:
+					continue
 				self.ram[ address] = v
-				print( hex(self.ram[ address]))
+#				print( self.ram[ address], hex(self.ram[ address]))
 				address += 1
+			print( "OPENING COMPLETE")
 		
 		
 		running = 1
+		print( self.ram)
 		while running:
 #			ir = self.ram[ self.pc]
 			ir = self.ram_read( self.pc)
 			op_a = self.ram_read( self.pc + 1)
 			op_b = self.ram_read( self.pc + 2)
 		
-			switchTable = {LDI: self.LDI,
-			               PRN: self.PRN,
-			               HLT: self.HLT
-			}
-			switchTable[ ir]()
+			if ir in self.switchTable:
+				self.switchTable[ ir]()
+		
+			# try:
+			# 	print( "IR", ir)
+			# 	self.switchTable[ ir]()  # execute
+			# except IndexError:
+			# 	print( f"Unknown instruction {ir} at address {self.pc}")
+	
+#	switchTable[ ir]()
 #		self.trace()
 #		running = 0
 
